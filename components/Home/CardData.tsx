@@ -23,16 +23,33 @@ interface CardDataProps {
 }
 
 export default function CardData({ cartItems, setCartItems }: CardDataProps) {
-  const vat = 50.0;
+
+  const vat = 51.0;
   const shippingcost = 20;
 
   const currentDate = new Date();
-  const day = currentDate.getDate();
-  const month = currentDate.getMonth() + 1; // Note: Months are zero-based, so January is 0
-  const year = currentDate.getFullYear();
+  const dayOfWeek = currentDate.getDay(); // Sunday: 0, Monday: 1, ..., Saturday: 6
+  
+  let deliveryDate = new Date(currentDate);
+  
+  // Check if it's Friday, Saturday, or Sunday
+  if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
+    // Add the remaining days until Monday
+    deliveryDate.setDate(currentDate.getDate() + (8 - dayOfWeek) + 1);
+  } else {
+    // Add 1 day to the current date
+    deliveryDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  const deliveryDay = deliveryDate.getDate();
+  const deliveryMonth = deliveryDate.getMonth() + 1; //january is 0
+  const deliveryYear = deliveryDate.getFullYear();
+  
+  // Format the delivery date as per your requirement
+  const formattedDate = `${deliveryDay}/${deliveryMonth}/${deliveryYear}`;
+  
 
-  // Format the date as per your requirement
-  const formattedDate = `${day}/${month}/${year}`;
+
 
   // Function to increase quantity
   const increaseQuantity = (_id: string) => {
@@ -87,6 +104,8 @@ export default function CardData({ cartItems, setCartItems }: CardDataProps) {
     setTotalCost(parseFloat(formattedTotalPrice));
   };
 
+
+  // console.log("cartItems",cartItems)
   return (
     <div>
       <h4 className="lg:text-2xl md:text-xl text-lg font-bold">Cart</h4>
@@ -97,7 +116,7 @@ export default function CardData({ cartItems, setCartItems }: CardDataProps) {
           cartItems?.map((data, index) => {
             return (
               <div
-                className="flex justify-between items-center gap-2 bg-white    p-2"
+                className="grid grid-cols-4 items-center gap-2 bg-white    p-2"
                 key={index}
               >
                 <Image
@@ -110,26 +129,27 @@ export default function CardData({ cartItems, setCartItems }: CardDataProps) {
                   className="h-12 w-12 lg:h-24 lg:w-24 object-contain"
                 />
 
-                <div className="flex flex-col gap-1">
-                  <p className="lg:text-xl text-lg font-bold">{data?.name}</p>
+                <div className="col-span-2 flex flex-col gap-1">
+                  <p className="lg:text-xl text-sm md:text-lg font-bold break-all ">{data?.name}</p>
                   <p className="lg:text-xl text-lg font-bold text-rose-400 mt-1">
                     ${data?.price}
                   </p>
                 </div>
-                <div className="flex gap-2 items-center">
-                  <div className="flex flex-row items-center gap-2 bg-orange-400 p-3">
+               <div className="flex justify-end">
+               <div className="flex gap-2 md:flex-row flex-col items-end md:items-center">
+                  <div className="flex flex-row items-center gap-2 bg-orange-400 p-1 md:p-3">
                     <RemoveIcon
-                      className="cursor-pointer text-white"
+                      className="cursor-pointer text-white md:text-base text-sm"
                       onClick={() => {
                         decreaseQuantity(data?._id);
                       }}
                     />
 
-                    <span className="text-white min-w-[20px]">
+                    <span className="text-white md:text-base text-sm min-w-[20px]">
                       {data?.quantity}
                     </span>
                     <AddIcon
-                      className="cursor-pointer text-white"
+                      className="cursor-pointer text-white md:text-base text-sm"
                       onClick={() => {
                         increaseQuantity(data?._id);
                       }}
@@ -142,6 +162,7 @@ export default function CardData({ cartItems, setCartItems }: CardDataProps) {
                     }}
                   />
                 </div>
+               </div>
               </div>
             );
           })

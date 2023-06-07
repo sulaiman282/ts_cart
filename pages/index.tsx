@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { IconButton, TextField } from "@mui/material";
@@ -40,7 +40,7 @@ export default function Index({ products }: IndexProps): JSX.Element {
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (_id: string, name: string, price: number) => {
+  const addToCart = (_id: string, name: string, price: number,image:string) => {
     const existingItem = cartItems.find((item) => item._id === _id);
     if (existingItem) {
       const updatedItems = cartItems.map((item) =>
@@ -53,11 +53,28 @@ export default function Index({ products }: IndexProps): JSX.Element {
         name,
         price,
         quantity: 1,
-        imageURL: "", // Provide the imageURL here
+        imageURL: image, // Provide the imageURL here
       };
       setCartItems([...cartItems, newItem]);
     }
   };
+
+
+  //do infinite scroll
+  const [visibleItems, setVisibleItems] = useState(5);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
+  
+    if (scrollTop + clientHeight === scrollHeight) {
+      // User has scrolled to the bottom
+      setScrollPosition(scrollTop);
+      setVisibleItems((prevVisibleItems) => prevVisibleItems + 5);
+    }
+  };
+  
+
+
 
   return (
     <>
@@ -82,13 +99,14 @@ export default function Index({ products }: IndexProps): JSX.Element {
                 onChange={handleSearch}
               ></TextField>
 
-              <div className="mt-5 flex flex-col gap-4 max-h-[500px] overflow-auto">
-                {searchResults?.map((data) => (
-                  <div className="" key={data._id}>
-                    <ProductCard data={data} addToCart={addToCart} />
-                  </div>
-                ))}
-              </div>
+<div className="mt-5 flex flex-col gap-4 max-h-[500px] overflow-auto" onScroll={handleScroll}>
+  {searchResults?.slice(0, visibleItems).map((data) => (
+    <div className="" key={data._id}>
+      <ProductCard data={data} addToCart={addToCart} />
+    </div>
+  ))}
+</div>
+
             </div>
 
             <div className="">

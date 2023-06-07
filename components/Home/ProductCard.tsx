@@ -10,7 +10,7 @@ interface ProductCardProps {
     name: string;
     price: number;
   };
-  addToCart: (id: string, name: string, price: number) => void;
+  addToCart: (id: string, name: string, price: number,image:string) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ data, addToCart }) => {
@@ -35,7 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ data, addToCart }) => {
       <div className="flex justify-end ">
         <IconButton
           className="w-8 h-8 lg:w-16 lg:h-16 bg-orange-400 hover:bg-orange-500 duration-300"
-          onClick={() => addToCart(data._id, data?.name, data?.price)}
+          onClick={() => addToCart(data._id, data?.name, data?.price,data?.imageURL)}
         >
           <AddIcon className="lg:text-4xl text-white" />
         </IconButton>
